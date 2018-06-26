@@ -11,7 +11,7 @@ function Mobius(e::Element)
     end
 end
 
-function beamtrace(elems::Vector{Element}, Γ0::Beam)
+function beamtrace(elems::Vector{<:Element}, Γ0::Beam)
     Γ = Vector{Beam}(length(elems)+1); Γ[1] = Γ0
     for (ind, e) in enumerate(elems)
         Γ[ind+1] = Mobius(e)(Γ[ind])
@@ -21,7 +21,7 @@ end
 
 discretize(e::Element, N::Int) = e
 discretize(e::FreeSpace, N::Int) = FreeSpace(e.L, N)
-discretize(els::Vector{Element}, N::Int) = vcat([discretize.(e,N) for e in els]...)
+discretize(els::Vector{<:Element}, N::Int) = vcat([discretize.(e,N) for e in els]...)
 
 spotsize(Γ::Beam) = /(-Γ.λ, π*Γ.n*imag(1/Γ.q)) |> sqrt
 location(Γ::Beam) = Γ.z
