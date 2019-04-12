@@ -5,5 +5,6 @@ export beamtrace, spotsize, location, discretize
 
 include("elements.jl")
 include("beamtrace.jl")
+include("comparisons.jl")
 
 end # module

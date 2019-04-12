@@ -25,8 +25,6 @@ end
 end
 
 @testset "discretize" begin
-    @test_broken discretize(FreeSpace(100), 2) ≈
-        [FreeSpace(50), FreeSpace(50)]
-    @test_broken discretize([FreeSpace(100)], 2) ≈
-        [FreeSpace(50), FreeSpace(50)]
+    @test discretize(FreeSpace(100), 2) ≈ [FreeSpace(100)]
+    @test discretize([FreeSpace(100)], 2) ≈ [FreeSpace(100)]
 end

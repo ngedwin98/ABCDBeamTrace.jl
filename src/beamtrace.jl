@@ -30,4 +30,4 @@ location(Γ::Beam) = Γ.z
 
 discretize(e::FreeSpace, N::Int) = fill(FreeSpace(e.L/N), N)
 discretize(e::Element, N::Int) = e
-discretize(els::Vector{<:Element}, N::Int) = discretize.(els,N)
+discretize(els::Vector{<:Element}, N::Int) = vcat(discretize.(els,N)...)
