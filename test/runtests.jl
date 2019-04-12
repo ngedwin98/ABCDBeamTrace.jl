@@ -5,16 +5,6 @@ else
     using Test
 end
 
-@testset "RTM" begin
-    @testset "of system" begin
-        f = 100e-3
-        L = 1000e-3
-        expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
-        system = [expander_2x; FreeSpace(L); reverse(expander_2x)]
-        @test RTM(system) isa Matrix
-    end
-end
-
 @testset "beamtrace" begin
     f = 100e-3
     L = 1000e-3
@@ -25,6 +15,7 @@ end
 end
 
 @testset "discretize" begin
-    @test discretize(FreeSpace(100), 2) ≈ [FreeSpace(100)]
-    @test discretize([FreeSpace(100)], 2) ≈ [FreeSpace(100)]
+    f = 100e-3
+    expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
+    @test length(discretize(expander_2x,10)) == 12
 end
