@@ -18,7 +18,7 @@ function transform(e::Element, Γ::Beam)
 end
 
 function beamtrace(elems::Vector{<:Element}, Γ0::Beam)
-    Γs = Vector{Beam}(length(elems)+1); Γs[1] = Γ0
+    Γs = Vector{Beam}(undef, length(elems)+1); Γs[1] = Γ0
     for (ind, elem) in enumerate(elems)
         Γs[ind+1] = transform(elem, Γs[ind])
     end
