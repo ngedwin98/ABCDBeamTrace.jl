@@ -13,3 +13,9 @@ end
     beam = Beam(1000e-9, 1.0e-3)
     @test beamtrace(system, beam) isa Vector{Beam}
 end
+
+@testset "discretize" begin
+    f = 100e-3
+    expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
+    @test length(discretize(expander_2x,10)) == 12
+end

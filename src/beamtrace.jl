@@ -28,6 +28,6 @@ end
 spotsize(Γ::Beam) = /(-Γ.λ, π*Γ.n*imag(1/Γ.q)) |> sqrt
 location(Γ::Beam) = Γ.z
 
-discretize(e::FreeSpace, N::Int) = fill(FreeSpace(L/N), N)
+discretize(e::FreeSpace, N::Int) = fill(FreeSpace(e.L/N), N)
 discretize(e::Element, N::Int) = e
-discretize(els::Vector{<:Element}, N::Int) = vcat(discretize.(e,N)...)
+discretize(els::Vector{<:Element}, N::Int) = vcat(discretize.(els,N)...)
