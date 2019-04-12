@@ -22,6 +22,16 @@ end
 Tan(e::FreeSpace) = e
 Sag(e::FreeSpace) = e
 
+"""
+
+RTM(element::Element) returns the Ray Transfer (ABCD) matrix
+associated with the given, optical element.
+
+RTM(elements) returns the Ray Transfer (ABCD) matrix associated with
+an optical system described by a collection (e.g. a vector or
+iteration) of optical elements.
+
+"""
 RTM(e::FreeSpace) = [1 e.L ; 0 1]
 RTM(e::Interface) = [1 0 ; (e.η-1)/e.R e.η]
 RTM(e::ThinLens) = [1 0 ; -1/e.f 1]
@@ -37,3 +47,4 @@ function RTM(e::Sag{Interface})
     θ1, η, R = e.e.θ, e.e.η, e.e.R; θ2 = asin(η*sin(θ1))
     return [1 0 ; (cos(θ2)-η*cos(θ1))/R η]
 end
+RTM(elements) = reduce(*, RTM.(elements))
