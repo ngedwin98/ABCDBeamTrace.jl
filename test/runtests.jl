@@ -13,3 +13,10 @@ end
     beam = Beam(1000e-9, 1.0e-3)
     @test beamtrace(system, beam) isa Vector{Beam}
 end
+
+@testset "discretize" begin
+    @test_broken discretize(FreeSpace(100), 2) ==
+        [FreeSpace(50), FreeSpace(50)]
+    @test_broken discretize([FreeSpace(100)], 2) ==
+        [FreeSpace(50), FreeSpace(50)]
+end
