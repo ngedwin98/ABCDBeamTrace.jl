@@ -5,5 +5,15 @@ else
     using Test
 end
 
-# write your own tests here
-@test 1 == 2
+@testset "beamtrace" begin
+    f = 100e-3
+    L = 1000e-3
+    expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
+    system = [expander_2x; FreeSpace(L); reverse(expander_2x)]
+    beam = Beam(1000e-9, 1.0e-3)
+    @static if VERSION >= v"1.0"
+        @test_broken beamtrace(system, beam) isa Vector{Beam}
+    else
+        @test beamtrace(system, beam) isa Vector{Beam}
+    end
+end
