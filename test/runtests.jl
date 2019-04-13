@@ -19,3 +19,13 @@ end
     expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
     @test length(discretize(expander_2x,10)) == 12
 end
+
+@testset "waitsradiusfunc" begin
+    w0 = 1e-3
+    f = 100e-3
+    expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
+    beam = Beam(1000e-9, w0)
+    @test waistradiusfunc(expander_2x, beam) isa Function
+    @test waistradiusfunc(expander_2x, beam)(0) == w0
+    @test waistradiusfunc(expander_2x, beam)(3f) ≈ 2w0 rtol=0.01
+end
