@@ -1,10 +1,15 @@
 # ABCDBeamTrace.jl
+```@meta
+CurrentModule = ABCDBeamTrace
+```
 
 A Julia package for performing calculations with the [ray transfer matrix (or ABCD) formalism](https://en.wikipedia.org/wiki/Ray_transfer_matrix_analysis), for both 1D ray tracing and [Gaussian beam](https://en.wikipedia.org/wiki/Gaussian_beam) propagation in the [paraxial approximation](https://en.wikipedia.org/wiki/Paraxial_approximation).
 
 The following introduction to the package assumes familiarity with the ABCD formalism and its utility in optical analysis and design.  In addition to the above links, the following are classic and useful introductory references:
 1. H. Kogelnik and T. Li, "Laser Beams and Resonators", *Applied Optics* **5**, 1550-1567 (1966)
 2. A. E. Siegman, *Lasers* (University Science Books, Sausalito, 1986)
+
+# Usage
 
 ## Installation
 This package is not yet registered.  It can be installed in Julia with the following:
@@ -82,7 +87,70 @@ We think of the optical elements as effecting a transformation on the beam state
 ### Beam and ray tracing
 Perhaps the most useful part of this whole package is the ability to trace the beam state by providing an initial beam state and propagating it forwards using the optical elements of a given system, recording the state after each element.  For an optical system represented by `elems::Vector{<:Element}` and an initial beam state represented by `Γ0::Beam`, `beamtrace(elems::Vector{<:Element},Γ0::Beam)` returns an instance of `Vector{Beam}` (of length given by `length(elems)+1`) where the first item is `Γ0`, and each subsequent item is the result of applying `transform` to the previous item using the corresponding item of `elems`.
 
-## Examples
+# Examples
+
+## Plotting
+
+To plot a system (a vector of [`Element`](@ref)) with a [`Beam`](@ref)
+`beam`, pass both as arguments to `Plots.plot` of the plot
+meta-package [Plots](https://github.com/JuliaPlots/Plots.jl). For
+exampe, to plot a laser beam's ``1/e^2`` full diameter, use the
+following:
+
+```@example
+using ABCDBeamTrace, Plots#, Colors
+f = 10e-3 # focal length of 10 mm in SI base units (m)
+L = 20e-3 # distance of 20 mm (SI) betweeen sub systems
+expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
+system = [expander_2x; FreeSpace(L); reverse(expander_2x)]
+λ = 532e-9 # wavelength of 532nm
+w0 = 1e-3 # beam waist radius of 1mm at entrance of system
+beam = Beam(λ, w0)
+plot(system, beam, size = (800, 150))
+savefig("plots-01.svg"); nothing # hide
+```
+
+![](plots-01.svg)
+
+Note that specifying an `aspect_ratio` (such as `:none`) is required
+if you want to exaggerate the beam width with respect to the distance
+along the optical axis and that it is helpful to also specify a custom
+`size` of the plot, especially if you do not want to exaggerate the
+beam width.
+
+It is possible to overlay several beams; for example, consider this
+code generating a plot of three beams of different wavelengths near
+the focus of a lens and exaggerates the beam width:
+
+```@example
+using ABCDBeamTrace, Plots#, Colors
+f = 50e-3 # focal length of 50 mm in SI base units (m)
+L = 1000e-3 # propagation length of 1 m (from the initial waist pos.)
+w0 = 1e-3 # 1mm waist radius (where the intensity drops to 1/e^2 * Imax)
+system = [FreeSpace(L), ThinLens(f), FreeSpace(0.98f), FreeSpace(0.04f)]
+plot(
+    xlims = (L+0.98f, L+1.02f), # custom range for x axis
+    ylims = (-20.0e-6, 20.0e-6), # custom range for y axis
+    size = (800, 500)
+)
+plot!(system, Beam(405e-9, w0), label="405 nm")
+plot!(system, Beam(532e-9, w0), label="532 nm")
+plot!(system, Beam(638e-9, w0), label="638 nm")
+plot!(
+    xlabel = "Distance along Beam Axis [m]",
+    ylabel = "Beam 1/e^2 Extent [m]",
+    aspect_ratio = :none
+)
+savefig("plots-02.svg"); nothing # hide
+```
+![](plots-02.svg)
+
+!!! note
+    Some arguments (`xlabel`, `ylabel`, `aspect_ratio`) must be given
+    in or after the last invocation of `plot` or `plot!` in order to
+    overwrite their default values.
+
+## Other Examples
 More detailed examples are upcoming.  In particular, this package has been developed with the following tasks in mind:
 * Cavity design
 * Mode-matching
@@ -95,3 +163,26 @@ Other interesting examples using this package are welcome!
 * Add examples of beam and ray tracing function calls
 * Add detailed Jupyter notebooks showing examples
 * Systematic tests of correctness and consistency
+
+# API Reference
+!!! note
+    This reference is a work in progress: It is incomplete.
+
+## Elements and Ray Transfer Matrices
+```@docs
+RTM
+```
+
+## Beam Tracing
+```@docs
+waistradiusfunc
+```
+
+## Miscellenea
+```@docs
+color
+```
+
+## Index
+```@index
+```

@@ -20,7 +20,7 @@ end
     @test length(discretize(expander_2x,10)) == 12
 end
 
-@testset "waitsradiusfunc" begin
+@testset "waistradiusfunc" begin
     w0 = 1e-3
     f = 100e-3
     expander_2x = [ThinLens(f), FreeSpace(3f), ThinLens(2f)]
