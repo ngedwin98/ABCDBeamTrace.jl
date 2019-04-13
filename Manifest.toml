@@ -159,6 +159,14 @@ uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
+[[Unitful]]
+deps = ["LinearAlgebra", "Random", "Test"]
+git-tree-sha1 = "bb8dfb68c78a7f590f2a4adcf5dc14cb2d027989"
+repo-rev = "qf-complex"
+repo-url = "https://github.com/Quantum-Factory/Unitful.jl.git"
+uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
+version = "0.15.0+"
+
 [[WoodburyMatrices]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Test"]
 git-tree-sha1 = "21772c33b447757ec7d3e61fcdfb9ea5c47eedcf"

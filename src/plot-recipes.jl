@@ -1,13 +1,14 @@
 # plot recipes, see https://docs.juliaplots.org/latest/recipes/ and
 # https://github.com/JuliaPlots/RecipesBase.jl
 
-mutable struct WithBeam
+mutable struct WithGaussianBeam
     system::Vector{<:Element}
-    beam::Beam
+    beam::GaussianBeam
+    unit::Number
 end
 
-# type recipe, e.g. for `plot(WithBeam(system, beam))`
-@recipe f(::Type{WithBeam}, data::WithBeam) = begin
+# type recipe, e.g. for `plot(WithGaussianBeam(system, beam))`
+@recipe f(::Type{WithGaussianBeam}, data::WithGaussianBeam) = begin
     seriestype := :shape
     linecolor --> color(data.beam.λ)
     fillcolor --> color(data.beam.λ)
@@ -20,17 +21,33 @@ end
     # chance of approximating minimum waist radii decently
     ds = discretize(data.system, 200)
     N = length(ds) + 1
-    Tw = typeof(float(spotsize(data.beam)))
-    Tz = typeof(float(location(data.beam)))
-    ws = Vector{Tw}(undef, N)
-    zs = Vector{Tz}(undef, N)
-    ws[1] = spotsize(data.beam)
-    zs[1] = location(data.beam)
+    unit = 1data.unit
+    # note: the following unit conversion could be achieved without
+    #       making Unitful a dependency, by adding 0.0 and the desired
+    #       fraction
+    ws1 = Unitful.uconvert(
+        Unitful.NoUnits,
+        spotradius(data.beam) / unit
+    )
+    zs1 = Unitful.uconvert(
+        Unitful.NoUnits,
+        location(data.beam) / unit
+    )
+    ws = Vector{typeof(ws1)}(undef, N)
+    zs = Vector{typeof(zs1)}(undef, N)
+    ws[1] = ws1
+    zs[1] = zs1
     beam = data.beam
     for i = 1:length(ds)
         beam = transform(ds[i], beam)
-        ws[i+1] = spotsize(beam)
-        zs[i+1] = location(beam)
+        ws[i+1] = Unitful.uconvert(
+            Unitful.NoUnits,
+            spotradius(beam) / unit
+        )
+        zs[i+1] = Unitful.uconvert(
+            Unitful.NoUnits,
+            location(beam) / unit
+        )
     end
     xs, ys = vcat(zs, reverse(zs)), vcat(ws, (-1.0) .* reverse(ws))
     [(xs[i], ys[i]) for i in 1:length(xs)]
@@ -53,11 +70,12 @@ const hue_of_λ = Interpolations.LinearInterpolation(
 
 Return a (very approximately) correct color from the package
 [Colors](http://docs.juliaplots.org/latest/colors/) for a given
-wavelength (specified in SI units, i.e. in the range from
-approximately `380e-9` to `700e-9`).
+wavelength (specified either as a `Unitful.Quantity` or in SI units,
+i.e. if dimensionless, then in the range from approximately `380e-9`
+to `700e-9`).
 
 """
-function color(λ)
+function color(λ::AbstractFloat)
     # very rough transformation of λ to a color via package Colors
     λmin = 380e-9
     λmax = 700e-9
@@ -70,7 +88,16 @@ function color(λ)
     end
     color = Colors.HSL(hue_of_λ(λ), 1.0, 0.5)
 end
+color(λ::Unitful.Length) =
+    color(Unitful.uconvert(Unitful.NoUnits, float(λ) / Unitful.m))
 
 # user recipe, e.g. for `plot(system, beam)`
-@recipe f(system::Vector{<:Element}, beam::Beam) =
-    WithBeam(system, beam)
+@recipe f(system::Vector{<:Element}, beam::GaussianBeam) =
+    WithGaussianBeam(
+        system,
+        beam,
+        (
+            Unitful.dimension(location(beam)) ==
+            Unitful.dimension(Unitful.m)
+        ) ? 1Unitful.m : 1
+    )
