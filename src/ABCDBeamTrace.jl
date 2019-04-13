@@ -5,6 +5,7 @@ export beamtrace, spotsize, location, discretize
 export waistradiusfunc
 export WithBeam
 
+using DocStringExtensions
 using RecipesBase
 import Colors, Interpolations
 
